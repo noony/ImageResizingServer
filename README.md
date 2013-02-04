@@ -19,8 +19,13 @@ Installation & Configuration
 
 	cp ./nginx-conf/ImageResizerServer /etc/nginx/site-enabled/
 	/etc/init.d/nginx/ restart
-    
+
+Usage
+-----
+
+
 run standalone
+
 	uwsgi --ini /srv/ImageResizerServer/config.ini
 
 
