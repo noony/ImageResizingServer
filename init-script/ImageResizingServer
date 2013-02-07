@@ -1,13 +1,13 @@
 #!/bin/sh
 
-PROJECTS_DIR=/srv/ImageResizerServer
+PROJECTS_DIR=/srv/ImageResizingServer
 CHDIR=${PROJECTS_DIR}
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON=uwsgi
+DAEMON=/usr/local/bin/uwsgi
 
-OWNER=www-data
-NAME=ImageResizerServer
-DESC=ImageResizerServer
+OWNER=root
+NAME=ImageResizingServer
+DESC=ImageResizingServer
 LOGFILE="/dev/null"
 
 test -x $DAEMON || exit 0
@@ -20,13 +20,13 @@ case "$1" in
         echo -n "Starting $DESC: "
         start-stop-daemon --start --chuid $OWNER:$OWNER --user $OWNER \
                 --exec $DAEMON -- $DAEMON_OPTS
-        echo "$NAME."
+        echo "$NAME started."
         ;;
   stop)
         echo -n "Stopping $DESC: "
         start-stop-daemon --signal 3 --user $OWNER --quiet --retry 2 --stop \
                 --exec $DAEMON
-        echo "$NAME."
+        echo "$NAME stopped."
         ;;
   reload)
         killall -1 $DAEMON
@@ -41,7 +41,7 @@ case "$1" in
         sleep 1
         start-stop-daemon --user $OWNER --start --quiet --chuid $OWNER:$OWNER \
                --exec $DAEMON -- $DAEMON_OPTS
-        echo "$NAME."
+        echo "$NAME restarted."
         ;;
   status)
         killall -10 $DAEMON

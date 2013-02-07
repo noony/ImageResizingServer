@@ -8,16 +8,17 @@ It was written in Python, using the Tornado framework, using Uwsgi to distribute
 Installation & Configuration
 -----------
 
-    cd /srv && git clone https://github.com/noony/ImageResizingServer.git
-    cd ./ImageResizingServer
-    
 need sudo :
 
+    apt-get install python-pip python-imaging nginx build-essential python-dev libxml2-dev
     pip install tornado uwsgi
-    apt-get install python-imaging nginx
+
+
+    cd /srv && git clone https://github.com/noony/ImageResizingServer.git
+    cd ./ImageResizingServer
 
     cp ./nginx-conf/ImageResizingServer /etc/nginx/sites-available/ && ln -s /etc/nginx/sites-available/ImageResizingServer /etc/nginx/sites-enabled/ImageResizingServer 
-    /etc/init.d/nginx/ restart
+    /etc/init.d/nginx restart
     
     cp ./init-script/ImageResizingServer /etc/init.d/.
     chmod 0755 /etc/init.d/ImageResizingServer
