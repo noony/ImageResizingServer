@@ -1,4 +1,4 @@
-ImageResizerServer
+ImageResizingServer
 ==================
 
 This server providing a service to resize image with a simple API in GET. It is able to hold heavy loads and is easy to use.
@@ -8,29 +8,29 @@ It was written in Python, using the Tornado framework, using Uwsgi to distribute
 Installation & Configuration
 -----------
 
-    cd /srv && git clone https://github.com/noony/ImageResizerServer.git
-    cd ./ImageResizerServer
+    cd /srv && git clone https://github.com/noony/ImageResizingServer.git
+    cd ./ImageResizingServer
     
 need sudo :
 
     pip install tornado uwsgi
     apt-get install python-imaging nginx
 
-    cp ./nginx-conf/ImageResizerServer /etc/nginx/sites-available/ && ln -s /etc/nginx/sites-available/ImageResizerServer /etc/nginx/sites-enabled/ImageResizerServer 
+    cp ./nginx-conf/ImageResizingServer /etc/nginx/sites-available/ && ln -s /etc/nginx/sites-available/ImageResizingServer /etc/nginx/sites-enabled/ImageResizingServer 
     /etc/init.d/nginx/ restart
     
-    cp ./init-script/ImageResizerServer /etc/init.d/.
-    chmod 0755 /etc/init.d/ImageResizerServer
+    cp ./init-script/ImageResizingServer /etc/init.d/.
+    chmod 0755 /etc/init.d/ImageResizingServer
 
 Run
 -----
 As service
 
-    /etc/init.d/ImageResizerServer start
+    /etc/init.d/ImageResizingServer start
 
 Standalone
 
-    uwsgi --ini /srv/ImageResizerServer/config.ini
+    uwsgi --ini /srv/ImageResizingServer/config.ini
 
 
 API
