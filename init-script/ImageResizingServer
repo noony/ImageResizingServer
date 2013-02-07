@@ -18,14 +18,12 @@ DAEMON_OPTS="-d ${LOGFILE} ${CHDIR}/config.ini"
 case "$1" in
   start)
         echo -n "Starting $DESC: "
-        start-stop-daemon --start --chuid $OWNER:$OWNER --user $OWNER \
-                --exec $DAEMON -- $DAEMON_OPTS
+        start-stop-daemon --start --chuid $OWNER:$OWNER --user $OWNER --exec $DAEMON -- $DAEMON_OPTS
         echo "$NAME started."
         ;;
   stop)
         echo -n "Stopping $DESC: "
-        start-stop-daemon --signal 3 --user $OWNER --quiet --retry 2 --stop \
-                --exec $DAEMON
+        start-stop-daemon --signal 3 --user $OWNER --quiet --retry 2 --stop --exec $DAEMON
         echo "$NAME stopped."
         ;;
   reload)
@@ -36,11 +34,9 @@ case "$1" in
        ;;
   restart)
         echo -n "Restarting $DESC: "
-        start-stop-daemon --signal 3 --user $OWNER --quiet --retry 2 --stop \
-                --exec $DAEMON
+        start-stop-daemon --signal 3 --user $OWNER --quiet --retry 2 --stop --exec $DAEMON
         sleep 1
-        start-stop-daemon --user $OWNER --start --quiet --chuid $OWNER:$OWNER \
-               --exec $DAEMON -- $DAEMON_OPTS
+        start-stop-daemon --user $OWNER --start --quiet --chuid $OWNER:$OWNER --exec $DAEMON -- $DAEMON_OPTS
         echo "$NAME restarted."
         ;;
   status)
