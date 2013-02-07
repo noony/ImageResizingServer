@@ -1,31 +1,54 @@
 ImageResizerServer
 ==================
 
-This server allows you to resize and manipulate images. It uses tornado, uwsgi and nginx.
+This server providing a service to resize image with a simple API in GET. It is able to hold heavy loads and is easy to use.
+
+It was written in Python, using the Tornado framework, using Uwsgi to distribute the application on the network and of course there is Nginx front-end.
 
 Installation & Configuration
 -----------
 
-	pip install tornado uwsgi
-	apt-get install python-imaging nginx
+    cd /srv && git clone https://github.com/noony/ImageResizerServer.git
+    cd ./ImageResizerServer
+    
+need sudo :
 
-	cd /tmp
-	git clone https://github.com/noony/ImageResizerServer.git
-	cd ./ImageResizerServer
+    pip install tornado uwsgi
+    apt-get install python-imaging nginx
 
-	mkdir /srv/ImageResizerServer
-	cp ./ImageResizerServer.py /srv/ImageResizerServer
-	cp ./config.ini /srv/ImageResizerServer
+    cp ./nginx-conf/ImageResizerServer /etc/nginx/sites-available/ && ln -s /etc/nginx/sites-available/ImageResizerServer /etc/nginx/sites-enabled/ImageResizerServer 
+    /etc/init.d/nginx/ restart
+    
+    cp ./init-script/ImageResizerServer /etc/init.d/.
+    chmod 0755 /etc/init.d/ImageResizerServer
 
-	cp ./nginx-conf/ImageResizerServer /etc/nginx/site-enabled/
-	/etc/init.d/nginx/ restart
-
-Usage
+Run
 -----
+As service
+
+    /etc/init.d/ImageResizerServer start
+
+Standalone
+
+    uwsgi --ini /srv/ImageResizerServer/config.ini
 
 
-run standalone
+API
+-----------
 
-	uwsgi --ini /srv/ImageResizerServer/config.ini
+* **i**
 
+i=  Image path, ex : /path/to/image.png
+
+* **c**
+
+c=  Cluster where is stocked original image, ex: cluster1
+
+* **w**
+
+h= desired width, max 2048, ex: 760
+
+* **h**
+
+h= desired height, max 2048, ex: 110
 

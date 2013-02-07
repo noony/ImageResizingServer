@@ -3,11 +3,12 @@
 PROJECTS_DIR=/srv/ImageResizerServer
 CHDIR=${PROJECTS_DIR}
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON=/usr/local/bin/uwsgi
+DAEMON=uwsgi
 
 OWNER=www-data
 NAME=ImageResizerServer
 DESC=ImageResizerServer
+LOGFILE="/dev/null"
 
 test -x $DAEMON || exit 0
 set -e
