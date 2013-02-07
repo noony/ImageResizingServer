@@ -46,7 +46,7 @@ c=  Cluster where is stocked original image, ex: cluster1
 
 * **w**
 
-h= desired width, max 2048, ex: 760
+w= desired width, max 2048, ex: 760
 
 * **h**
 
