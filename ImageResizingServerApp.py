@@ -1,4 +1,7 @@
-from PIL import Image
+try:
+    from PIL import Image
+except ImportError:
+    import Image
 
 import httplib
 import StringIO
@@ -85,24 +88,24 @@ class ResizerHandler(tornado.web.RequestHandler):
         return True
     
     def loadImageFromCluster(self):
-		link = httplib.HTTPConnection( options.clusterInfos.get(self.cluster), timeout = 1 )
-		link.request( 'GET', self.imgUrl )
-		resp = link.getresponse()
+        link = httplib.HTTPConnection( options.clusterInfos.get(self.cluster), timeout = 1 )
+        link.request( 'GET', self.imgUrl )
+        resp = link.getresponse()
 
-		status = resp.status
-		
-		if status == httplib.OK:
-			content_type = resp.getheader( 'Content-Type' )
-			if content_type.startswith( 'image' ):
-				content = resp.read()
-			else:
-				self.send_error(415)
-		else:
-			self.send_error(404)
-		
-		link.close()
-		content = StringIO.StringIO(content)
-            
+        status = resp.status
+        
+        if status == httplib.OK:
+            content_type = resp.getheader( 'Content-Type' )
+            if content_type.startswith( 'image' ):
+                content = resp.read()
+            else:
+                self.send_error(415)
+        else:
+            self.send_error(404)
+        
+        link.close()
+        content = StringIO.StringIO(content)
+        
         try:
             self.pilImage = Image.open(content)
             self.pilImage.load()
