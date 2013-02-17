@@ -5,7 +5,7 @@ This server providing a service to resize image with a simple API in GET. It's a
 
 It was written in Python, using Tornado web framework, Uwsgi to distribute the application on the network and Nginx front-end.
 
-Installation & Configuration
+Installation
 -----------
 
     cd /tmp && git clone https://github.com/noony/ImageResizingServer.git
@@ -24,6 +24,30 @@ need sudo :
     
     cp ./nginx-conf/ImageResizingServer /etc/nginx/sites-available/ && ln -s /etc/nginx/sites-available/ImageResizingServer /etc/nginx/sites-enabled/ImageResizingServer 
     /etc/init.d/nginx restart
+
+Configuration
+-----------
+
+You have to define your cluster. It a simple dict in ImageResizingServerApp.py
+
+define("clusterInfos", default={}, help="url of img cluster", type=dict)
+
+Example : 
+
+define("clusterInfos", default={'1': 'url.cluster1.com', '2': 'url.cluster2.com'}, help="url of img cluster", type=dict)
+
+You have to restart uwsgi after.
+
+Example
+-----------
+Resize an image to 100px width :
+http://example.com/?c=1&=/path/to/image.png&w=100
+
+Resize an image to 300px height :
+http://example.com/?c=1&=/path/to/image.png&h=300
+
+Resize an image to 600px width and change is quality to 60% :
+http://example.com/?c=1&=/path/to/image.png&w=600&q=60
 
 API
 -----------
