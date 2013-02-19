@@ -5,6 +5,8 @@ This server providing a service to resize image with a simple API in GET. It's a
 
 It was written in Python, using Tornado web framework, Uwsgi to distribute the application on the network and Nginx front-end.
 
+I want to specially thanks Stéphane Bunel, he was the initiator of this project, and advised me on how to re-develop this project for open-sourcing.
+
 Installation
 -----------
 
