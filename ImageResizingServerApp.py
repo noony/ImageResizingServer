@@ -18,6 +18,8 @@ define("port", default=8888, help="run on the given port", type=int)
 define("muninEnabled", default=True, help="have munin stats", type=bool)
 define("clusterInfos", default={}, help="url of img cluster", type=dict)
 
+LOG = logging.getLogger( __name__ )
+LOG.setLevel(logging.ERROR)
 
 class ResizerHandler(tornado.web.RequestHandler):
     pilImage = None
@@ -57,7 +59,7 @@ class ResizerHandler(tornado.web.RequestHandler):
             self.write(image.getvalue())
             self.finish()
         except:
-            print sys.exc_info()[1]
+            LOG.error('Finish Request Error {0}'.format(sys.exc_info()[ 1 ])
             self.send_error(500)
 
         return True
@@ -118,20 +120,19 @@ class ResizerHandler(tornado.web.RequestHandler):
             self.original_width, self.original_height = self.pilImage.size
             self.format = self.pilImage.format
         except:
-            print sys.exc_info()[1]
+            LOG.error('Make PIL Image Error {0}'.format(sys.exc_info()[ 1 ])
             self.send_error(415)
 
         return True
 
     def resizeImage(self):
-        start_time = time.time()
         try:
             test = self.pilImage.resize(
                 (self.new_width, self.new_height), Image.ANTIALIAS)
             self.pilImage = test
         except:
+            LOG.error('Resize Error {0}'.format(sys.exc_info()[ 1 ])
             self.send_error(500)
-        print 'Resize : ' + str((time.time() - start_time) * 1000.0)
         return True
 
 tornadoapp = tornado.wsgi.WSGIApplication([
