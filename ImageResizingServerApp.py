@@ -9,6 +9,7 @@ import os
 import sys
 import time
 import signal
+import logging
 
 import tornado.web
 import tornado.wsgi
@@ -18,48 +19,66 @@ define("port", default=8888, help="run on the given port", type=int)
 define("muninEnabled", default=True, help="have munin stats", type=bool)
 define("clusterInfos", default={}, help="url of img cluster", type=dict)
 
-LOG = logging.getLogger( __name__ )
-LOG.setLevel(logging.ERROR)
+#~ LOG = logging.getLogger(__name__)
+# LOG.setLevel(logging.ERROR)
 
 class ResizerHandler(tornado.web.RequestHandler):
     pilImage = None
     imgUrl = None
     cluster = None
     format = None
+    crop = False
     quality = 90
-    new_height = 0
-    new_width = 0
-    original_width = 0
-    original_height = 0
+    newHeight = 0
+    newWidth = 0
+    originalWidth = 0
+    originalHeight = 0
 
     def get(self):
         self.checkParams()
         self.loadImageFromCluster()
 
-        if self.new_width + self.new_height == 0:
-            pass
-        elif self.new_width == self.original_width and self.new_height == 0:
-            pass
-        elif self.new_height == self.original_height and self.new_width == 0:
-            pass
-        elif self.new_width > 0 and self.new_height == 0:
-            ratio = float(self.new_width) / self.original_width
-            self.new_height = int(ratio * self.original_height) or 1
+        if self.crop:
+            cropRatio = float(self.newHeight) / self.newWidth
+            ratio = float(self.originalWidth) / self.originalHeight
+
+            if cropRatio > ratio:
+                cropW = self.originalWidth
+                cropH = int(self.originalWidth / cropRatio) or 1
+            else:
+                cropH = self.originalHeight
+                cropW = int(cropRatio * self.originalHeight) or 1
+
+            cropX = int(0.5 * (self.originalWidth - cropW))
+            cropY = int(0.5 * (self.originalHeight - cropH))
+
+            self.cropImage(cropX, cropY, cropW, cropH)
             self.resizeImage()
-        elif self.new_height > 0 and self.new_width == 0:
-            ratio = float(self.new_height) / self.original_height
-            self.new_width = int(ratio * self.original_width) or 1
-            self.resizeImage()
+        else:
+            if self.newWidth + self.newHeight == 0:
+                pass
+            elif self.newWidth == self.originalWidth and self.newHeight == 0:
+                pass
+            elif self.newHeight == self.originalHeight and self.newWidth == 0:
+                pass
+            elif self.newWidth > 0 and self.newHeight == 0:
+                ratio = float(self.newWidth) / self.originalWidth
+                self.newHeight = int(ratio * self.originalHeight) or 1
+                self.resizeImage()
+            elif self.newHeight > 0 and self.newWidth == 0:
+                ratio = float(self.newHeight) / self.originalHeight
+                self.newWidth = int(ratio * self.originalWidth) or 1
+                self.resizeImage()
 
         image = StringIO.StringIO()
 
         try:
-            self.pilImage.save(image, format, quality=context['param_q'])
-            self.set_header('Content-Type', 'image/' + format.lower())
+            self.pilImage.save(image, self.format, quality=self.quality)
+            self.set_header('Content-Type', 'image/' + self.format.lower())
             self.write(image.getvalue())
-            self.finish()
         except:
-            LOG.error('Finish Request Error {0}'.format(sys.exc_info()[ 1 ])
+            print 'Finish Request Error {0}'.format(sys.exc_info()[ 1 ])
+            # LOG.error('Finish Request Error {0}'.format(sys.exc_info()[ 1 ]))
             self.send_error(500)
 
         return True
@@ -71,24 +90,30 @@ class ResizerHandler(tornado.web.RequestHandler):
         if self.cluster not in options.clusterInfos:
             self.send_error(400)
 
-        self.new_height = self.get_argument('h', None)
-        self.new_width = self.get_argument('w', None)
+        self.crop = self.get_argument('crop', False)
 
-        if self.new_height != None:
-            self.new_height = int(self.new_height)
-            if self.new_height < 1 or self.new_height > 2048:
+        if self.crop:
+            self.newHeight = self.get_argument('h')
+            self.newWidth = self.get_argument('w')
+        else:
+            self.newHeight = self.get_argument('h', None)
+            self.newWidth = self.get_argument('w', None)
+
+        if self.newHeight != None:
+            self.newHeight = int(self.newHeight)
+            if self.newHeight < 1 or self.newHeight > 2048:
                 self.send_error(400)
         else:
-            self.new_height = 0
+            self.newHeight = 0
 
-        if self.new_width != None:
-            self.new_width = int(self.new_width)
-            if self.new_width < 1 or self.new_width > 2048:
+        if self.newWidth != None:
+            self.newWidth = int(self.newWidth)
+            if self.newWidth < 1 or self.newWidth > 2048:
                 self.send_error(400)
         else:
-            self.new_width = 0
+            self.newWidth = 0
 
-        self.quality = self.get_argument('h', 90)
+        self.quality = int(self.get_argument('q', 90))
         if self.quality < 0 or self.quality > 100:
             self.send_error(400)
 
@@ -117,30 +142,43 @@ class ResizerHandler(tornado.web.RequestHandler):
         try:
             self.pilImage = Image.open(content)
             self.pilImage.load()
-            self.original_width, self.original_height = self.pilImage.size
+            self.originalWidth, self.originalHeight = self.pilImage.size
             self.format = self.pilImage.format
         except:
-            LOG.error('Make PIL Image Error {0}'.format(sys.exc_info()[ 1 ])
+            # LOG.error('Make PIL Image Error {0}'.format(sys.exc_info()[ 1 ]))
             self.send_error(415)
 
         return True
 
     def resizeImage(self):
         try:
-            test = self.pilImage.resize(
-                (self.new_width, self.new_height), Image.ANTIALIAS)
-            self.pilImage = test
+            newImg = self.pilImage.resize(
+                (self.newWidth, self.newHeight), Image.ANTIALIAS)
+            self.pilImage = newImg
         except:
-            LOG.error('Resize Error {0}'.format(sys.exc_info()[ 1 ])
+            # LOG.error('Resize Error {0}'.format(sys.exc_info()[ 1 ]))
             self.send_error(500)
         return True
+
+    def cropImage(self, cropX, cropY, cropW, cropH):
+        try:
+            newImg = self.pilImage.crop(
+                (cropX, cropY, (cropX+cropW), (cropY+cropH)))
+            self.pilImage = newImg
+        except:
+            # LOG.error('Crop Error {0}'.format(sys.exc_info()[ 1 ]))
+            self.send_error(500)
 
 tornadoapp = tornado.wsgi.WSGIApplication([
     (r"/", ResizerHandler),
 ])
 
-
 def application(environ, start_response):
     if 'SCRIPT_NAME' in environ:
         del environ['SCRIPT_NAME']
     return tornadoapp(environ, start_response)
+
+if __name__ == "__main__":
+    import wsgiref.simple_server
+    server = wsgiref.simple_server.make_server('', 8888, application)
+    server.serve_forever()
