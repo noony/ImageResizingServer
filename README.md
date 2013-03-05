@@ -80,4 +80,5 @@ h= desired height, max 2048, ex: 110
 q= desired quality, default 90, ex: 100
 
 * **crop**
+
 crop= if you want to crop image set this parameter. Crop need both parameter h and w. Crop take the larger box with your resize ratio and resize to the specified size.
