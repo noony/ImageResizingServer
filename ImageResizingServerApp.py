@@ -78,7 +78,7 @@ class ResizerHandler(tornado.web.RequestHandler):
             self.write(image.getvalue())
         except:
             LOG.error('Finish Request Error {0}'.format(sys.exc_info()[ 1 ]))
-            self.send_error(500)
+            raise tornado.web.HTTPError(500)
 
         return True
 
@@ -87,7 +87,7 @@ class ResizerHandler(tornado.web.RequestHandler):
 
         self.cluster = self.get_argument('c')
         if self.cluster not in options.clusterInfos:
-            self.send_error(400)
+            raise tornado.web.HTTPError(400)
 
         self.crop = self.get_argument('crop', False)
 
@@ -101,20 +101,20 @@ class ResizerHandler(tornado.web.RequestHandler):
         if self.newHeight != None:
             self.newHeight = int(self.newHeight)
             if self.newHeight < 1 or self.newHeight > 2048:
-                self.send_error(400)
+                raise tornado.web.HTTPError(400)
         else:
             self.newHeight = 0
 
         if self.newWidth != None:
             self.newWidth = int(self.newWidth)
             if self.newWidth < 1 or self.newWidth > 2048:
-                self.send_error(400)
+                raise tornado.web.HTTPError(400)
         else:
             self.newWidth = 0
 
         self.quality = int(self.get_argument('q', 90))
         if self.quality < 0 or self.quality > 100:
-            self.send_error(400)
+            raise tornado.web.HTTPError(400)
 
         return True
 
@@ -131,9 +131,9 @@ class ResizerHandler(tornado.web.RequestHandler):
             if content_type.startswith('image'):
                 content = resp.read()
             else:
-                self.send_error(415)
+                raise tornado.web.HTTPError(415)
         else:
-            self.send_error(404)
+            raise tornado.web.HTTPError(404)
             
         link.close()
         content = StringIO.StringIO(content)
@@ -145,7 +145,7 @@ class ResizerHandler(tornado.web.RequestHandler):
             self.format = self.pilImage.format
         except:
             LOG.error('Make PIL Image Error {0}'.format(sys.exc_info()[ 1 ]))
-            self.send_error(415)
+            raise tornado.web.HTTPError(415)
 
         return True
 
@@ -156,7 +156,7 @@ class ResizerHandler(tornado.web.RequestHandler):
             self.pilImage = newImg
         except:
             LOG.error('Resize Error {0}'.format(sys.exc_info()[ 1 ]))
-            self.send_error(500)
+            raise tornado.web.HTTPError(500)
         return True
 
     def cropImage(self, cropX, cropY, cropW, cropH):
@@ -166,7 +166,7 @@ class ResizerHandler(tornado.web.RequestHandler):
             self.pilImage = newImg
         except:
             LOG.error('Crop Error {0}'.format(sys.exc_info()[ 1 ]))
-            self.send_error(500)
+            raise tornado.web.HTTPError(500)
 
 tornadoapp = tornado.wsgi.WSGIApplication([
     (r"/", ResizerHandler),
