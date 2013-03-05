@@ -1,7 +1,7 @@
 ImageResizingServer
 ==================
 
-This server providing a service to resize image with a simple API in GET. It's able to hold heavy loads and is easy to use.
+This server providing a service to resize or crop image with a simple API in GET. It's able to hold heavy loads and is easy to use.
 
 It was written in Python, using Tornado web framework, Uwsgi to distribute the application on the network and Nginx front-end.
 
@@ -52,6 +52,10 @@ Resize an image to 600px width and change is quality to 60% :
 
 http://example.com/?c=1&=/path/to/image.png&w=600&q=60
 
+Crop an image and resize 200/200px :
+
+http://example.com/?c=1&=/path/to/image.png&w=200&h=200&crop=1
+
 API
 -----------
 
@@ -73,5 +77,7 @@ h= desired height, max 2048, ex: 110
 
 * **q**
 
-quality= desired quality, default 90, ex: 100
+q= desired quality, default 90, ex: 100
 
+* **crop**
+crop= if you want to crop image set this parameter. Crop need both parameter h and w. Crop take the larger box with your resize ratio and resize to the specified size.

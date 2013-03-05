@@ -19,8 +19,8 @@ define("port", default=8888, help="run on the given port", type=int)
 define("muninEnabled", default=True, help="have munin stats", type=bool)
 define("clusterInfos", default={}, help="url of img cluster", type=dict)
 
-#~ LOG = logging.getLogger(__name__)
-# LOG.setLevel(logging.ERROR)
+LOG = logging.getLogger(__name__)
+LOG.setLevel(logging.ERROR)
 
 class ResizerHandler(tornado.web.RequestHandler):
     pilImage = None
@@ -77,8 +77,7 @@ class ResizerHandler(tornado.web.RequestHandler):
             self.set_header('Content-Type', 'image/' + self.format.lower())
             self.write(image.getvalue())
         except:
-            print 'Finish Request Error {0}'.format(sys.exc_info()[ 1 ])
-            # LOG.error('Finish Request Error {0}'.format(sys.exc_info()[ 1 ]))
+            LOG.error('Finish Request Error {0}'.format(sys.exc_info()[ 1 ]))
             self.send_error(500)
 
         return True
@@ -135,7 +134,7 @@ class ResizerHandler(tornado.web.RequestHandler):
                 self.send_error(415)
         else:
             self.send_error(404)
-
+            
         link.close()
         content = StringIO.StringIO(content)
 
@@ -145,7 +144,7 @@ class ResizerHandler(tornado.web.RequestHandler):
             self.originalWidth, self.originalHeight = self.pilImage.size
             self.format = self.pilImage.format
         except:
-            # LOG.error('Make PIL Image Error {0}'.format(sys.exc_info()[ 1 ]))
+            LOG.error('Make PIL Image Error {0}'.format(sys.exc_info()[ 1 ]))
             self.send_error(415)
 
         return True
@@ -156,7 +155,7 @@ class ResizerHandler(tornado.web.RequestHandler):
                 (self.newWidth, self.newHeight), Image.ANTIALIAS)
             self.pilImage = newImg
         except:
-            # LOG.error('Resize Error {0}'.format(sys.exc_info()[ 1 ]))
+            LOG.error('Resize Error {0}'.format(sys.exc_info()[ 1 ]))
             self.send_error(500)
         return True
 
@@ -166,7 +165,7 @@ class ResizerHandler(tornado.web.RequestHandler):
                 (cropX, cropY, (cropX+cropW), (cropY+cropH)))
             self.pilImage = newImg
         except:
-            # LOG.error('Crop Error {0}'.format(sys.exc_info()[ 1 ]))
+            LOG.error('Crop Error {0}'.format(sys.exc_info()[ 1 ]))
             self.send_error(500)
 
 tornadoapp = tornado.wsgi.WSGIApplication([
@@ -177,8 +176,3 @@ def application(environ, start_response):
     if 'SCRIPT_NAME' in environ:
         del environ['SCRIPT_NAME']
     return tornadoapp(environ, start_response)
-
-if __name__ == "__main__":
-    import wsgiref.simple_server
-    server = wsgiref.simple_server.make_server('', 8888, application)
-    server.serve_forever()
