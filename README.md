@@ -15,6 +15,7 @@ Installation
 
     mkdir /var/www/ImageResizingServer
     cp ImageResizingServer.py /var/www/ImageResizingServer/
+    cp server.conf /var/www/ImageResizingServer/
 
 need sudo :
 
@@ -30,11 +31,14 @@ need sudo :
 Configuration
 -----------
 
-You have to define your image clusters. It a simple dict in ImageResizingServerApp.py
+You have to define your image clusters. It a simple dict in server.conf
 
 Example : 
 
-    define("clusterInfos", default={'1': 'url.cluster1.com', '2': 'url.cluster2.com'}, help="url of img cluster", type=dict)
+clusterInfos = {
+    '1': 'url.cluster1.com',
+    '2': 'url.cluster2.com'
+}
 
 You have to restart uwsgi after.
 

@@ -15,9 +15,8 @@ import tornado.web
 import tornado.wsgi
 from tornado.options import define, options
 
-define("port", default=8888, help="run on the given port", type=int)
-define("muninEnabled", default=True, help="have munin stats", type=bool)
 define("clusterInfos", default={}, help="url of img cluster", type=dict)
+options.parse_config_file('./server.conf')
 
 LOG = logging.getLogger(__name__)
 LOG.setLevel(logging.ERROR)
