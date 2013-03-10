@@ -35,12 +35,10 @@ You have to define your image clusters. It a simple dict in server.conf
 
 Example : 
 
-clusterInfos = {
-    '1': 'url.cluster1.com',
-    
-    '2': 'url.cluster2.com'
-    
-}
+    clusterInfos = {
+        '1': 'url.cluster1.com',
+        '2': 'url.cluster2.com'
+    }
 
 You have to restart uwsgi after.
 
