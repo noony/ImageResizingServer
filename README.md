@@ -37,7 +37,9 @@ Example :
 
 clusterInfos = {
     '1': 'url.cluster1.com',
+    
     '2': 'url.cluster2.com'
+    
 }
 
 You have to restart uwsgi after.
