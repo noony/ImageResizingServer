@@ -14,8 +14,7 @@ Installation
     cd ./ImageResizingServer
 
     mkdir /var/www/ImageResizingServer
-    cp ImageResizingServer.py /var/www/ImageResizingServer/
-    cp server.conf /var/www/ImageResizingServer/
+    cp app/* /var/www/ImageResizingServer/
 
 need sudo :
 
