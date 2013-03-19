@@ -1,7 +1,7 @@
 ImageResizingServer
 ==================
 
-This server providing a service to resize or crop image with a simple API in GET. It's able to hold heavy loads and is easy to use.
+This server provides a service to resize and crop the image with a simple API GET. It's able to hold heavy loads and is easy to use.
 
 It was written in Python, using Tornado web framework, Uwsgi to distribute the application on the network and Nginx front-end.
 
