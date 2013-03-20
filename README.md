@@ -7,6 +7,8 @@ It was written in Python, using Tornado web framework, Uwsgi to distribute the a
 
 I want to specially thanks Stéphane Bunel, he was the initiator of this project, and advised me on how to re-develop this project for open-sourcing.
 
+It's my first open-source project, feel free to contribute.
+
 Installation
 -----------
 
