@@ -1,4 +1,4 @@
-ImageResizingServer
+Image Resizing Server
 ==================
 
 This server provides a service to resize and crop images with a simple GET API. It's able to hold heavy loads and is easy to use.
