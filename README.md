@@ -15,12 +15,10 @@ Installation
 need sudo :
 
     apt-get install python-pip python-imaging uwsgi nginx build-essential python-dev libxml2-dev && pip install tornado
-
     cd /tmp && git clone https://github.com/noony/ImageResizingServer.git && cd ./ImageResizingServer
-
     python setup.py install
-
-    Attention if you haven't installed nginx you have to remove default conf in sites-enabled (rm /etc/nginx/sites-enabled/default)
+    
+Attention if you haven't installed nginx you have to remove default conf in sites-enabled (rm /etc/nginx/sites-enabled/default)
     
 
 Configuration
