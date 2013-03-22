@@ -10,8 +10,6 @@ except ImportError:
 
 kwargs = {}
 
-version = "1.0"
-
 distutils.core.setup(
     name="ImageResizingServer",
     version=version,
@@ -23,7 +21,7 @@ distutils.core.setup(
     author="Thomas Colomb",
     author_email="",
     url="https://github.com/noony",
-    download_url="https://github.com/noony/ImageResizingServer/tarball/%s" % version,
+    download_url="https://github.com/noony/ImageResizingServer/tarball/master",
     license="",
     description="This server provides a service to resize and crop images with a simple GET API.",
     classifiers=[
