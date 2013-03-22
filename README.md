@@ -12,22 +12,16 @@ It's my first open-source project, feel free to contribute.
 Installation
 -----------
 
-    cd /tmp && git clone https://github.com/noony/ImageResizingServer.git
-    cd ./ImageResizingServer
-
-    mkdir /var/www/ImageResizingServer
-    cp app/* /var/www/ImageResizingServer/
-
 need sudo :
 
-    apt-get install python-pip python-imaging uwsgi nginx build-essential python-dev libxml2-dev
-    pip install tornado
+    apt-get install python-pip python-imaging uwsgi nginx build-essential python-dev libxml2-dev && pip install tornado
+
+    cd /tmp && git clone https://github.com/noony/ImageResizingServer.git && cd ./ImageResizingServer
+
+    python setup.py install
+
+    Attention if you haven't installed nginx you have to remove default conf in sites-enabled (rm /etc/nginx/sites-enabled/default)
     
-    cp ./ImageResizingServer.ini /etc/uwsgi/apps-enabled/
-    /etc/init.d/uwsgi restart
-    
-    cp ./nginx-conf/ImageResizingServer /etc/nginx/sites-available/ && ln -s /etc/nginx/sites-available/ImageResizingServer /etc/nginx/sites-enabled/ImageResizingServer 
-    /etc/init.d/nginx restart
 
 Configuration
 -----------
