@@ -5,7 +5,7 @@ This server provides a service to resize and crop images with a simple GET API. 
 
 It was written in Python, using Tornado web framework, Uwsgi to distribute the application on the network and Nginx front-end.
 
-I want to specially thanks Stéphane Bunel, he was the initiator of this project, and advised me on how to re-develop this project for open-sourcing.
+I want to specially thanks Stéphane Bunel (https://bitbucket.org/StephaneBunel), he was the initiator of this project, and advised me on how to re-develop this project for open-sourcing.
 
 It's my first open-source project, feel free to contribute.
 
