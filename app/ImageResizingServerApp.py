@@ -3,13 +3,14 @@ try:
 except ImportError:
     import Image
 
-import httplib
-import StringIO
 import os
+import re
 import sys
 import time
 import signal
 import logging
+import httplib
+import StringIO
 
 import tornado.web
 import tornado.wsgi
@@ -39,8 +40,8 @@ class ResizerHandler(tornado.web.RequestHandler):
     originalWidth = 0
     originalHeight = 0
 
-    def get(self):
-        self.checkParams()
+    def get(self, cluster, crop, quality, width, height, imgUrl):
+        self.checkParams(cluster, crop, quality, width, height, imgUrl)
         self.loadImageFromCluster()
 
         if self.crop:
@@ -74,6 +75,8 @@ class ResizerHandler(tornado.web.RequestHandler):
                 ratio = float(self.newHeight) / self.originalHeight
                 self.newWidth = int(ratio * self.originalWidth) or 1
                 self.resizeImage()
+            else:
+                self.resizeImage()
 
         image = StringIO.StringIO()
 
@@ -88,44 +91,38 @@ class ResizerHandler(tornado.web.RequestHandler):
 
         return True
 
-    def checkParams(self):
-        self.imgUrl = self.get_argument('i')
+    def checkParams(self, cluster, crop, quality, width, height, imgUrl):
+        self.imgUrl = '/' + imgUrl
+        self.newHeight = int(height)
+        self.newWidth = int(width)
+        self.cluster = cluster
 
-        self.cluster = self.get_argument('c')
         if self.cluster not in options.clusterInfos:
-            raise tornado.web.HTTPError(400, 'Bad argument c : cluster {0} not found in configuration'.format(self.cluster))
+            raise tornado.web.HTTPError(400, 'Bad argument Cluster : cluster {0} not found in configuration'.format(self.cluster))
 
-        self.crop = self.get_argument('crop', False)
-        
-        self.newHeight = self.get_argument('h', None)
-        self.newWidth = self.get_argument('w', None)
-        
-        if self.crop and (self.newHeight == None or self.newWidth == None):
-            raise tornado.web.HTTPError(400, 'Bad argument crop need h and w together')
+        if self.newHeight == 0 and self.newWidth == 0:
+            raise tornado.web.HTTPError(400, 'Bad argument Height and Width can\'t be both at 0')
 
-        if self.newHeight != None:
-            if not self.newHeight.isdigit():
-                self.newHeight = 0
-            
-            self.newHeight = int(self.newHeight)
+        if self.newHeight != 0:
             if self.newHeight < options.minHeight or self.newHeight > options.maxHeight:
-                raise tornado.web.HTTPError(400, 'Bad argument h : {0}>=h<{1}'.format(options.minHeight, options.maxHeight))
-        else:
-            self.newHeight = 0
+                raise tornado.web.HTTPError(400, 'Bad argument Height : {0}>=h<{1}'.format(options.minHeight, options.maxHeight))
 
-        if self.newWidth != None:
-            if not self.newWidth.isdigit():
-                self.newWidth = 0
-            
-            self.newWidth = int(self.newWidth)
+        if self.newWidth != 0:
             if self.newWidth < options.minWidth or self.newWidth > options.maxWidth:
-                raise tornado.web.HTTPError(400, 'Bad argument w : {0}>=w<{1}'.format(options.minWidth, options.maxWidth))
-        else:
-            self.newWidth = 0
+                raise tornado.web.HTTPError(400, 'Bad argument Width : {0}>=w<{1}'.format(options.minWidth, options.maxWidth))
 
-        self.quality = int(self.get_argument('q', options.defaultQuality))
+        if quality is not None:
+            self.quality = int(re.match(r'\d+', quality).group())
+        else:
+            self.quality = options.defaultQuality
+
         if self.quality <= 0 or self.quality > 100:
-            raise tornado.web.HTTPError(400, 'Bad argument q : 0>q<100')
+            raise tornado.web.HTTPError(400, 'Bad argument Quality : 0>q<100')
+
+        if crop is not None:
+            self.crop = True
+            if self.newWidth == 0 or self.newHeight == 0:
+                raise tornado.web.HTTPError(400, 'Crop error, you have to sprecify both Width ({0}) and Height ({1})'.format(self.newWidth, self.newHeight))
 
         return True
 
@@ -201,7 +198,7 @@ class ResizerHandler(tornado.web.RequestHandler):
                     })
 
 tornadoapp = tornado.wsgi.WSGIApplication([
-    (r"/", ResizerHandler),
+    (r"/([0-9a-zA-Z]+)/(crop/)?(\d+/)?(\d+)x(\d+)/(.+)", ResizerHandler),
 ])
 
 def application(environ, start_response):

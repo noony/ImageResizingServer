@@ -29,8 +29,8 @@ You have to define your image clusters. It a simple dict in server.conf
 Example : 
 
     clusterInfos = {
-        '1': 'url.cluster1.com',
-        '2': 'url.cluster2.com'
+        'cluster1': 'url.cluster1.com',
+        'cluster2': 'url.cluster2.com'
     }
 
 You have to restart uwsgi after.
@@ -39,43 +39,20 @@ Examples
 -----------
 Resize an image to 100px width :
 
-http://example.com/?c=1&=/path/to/image.png&w=100
+http://example.com/cluster1/100x0/path/to/image.png
 
 Resize an image to 300px height :
 
-http://example.com/?c=1&=/path/to/image.png&h=300
+http://example.com/cluster1/0x300/path/to/image.png
 
 Resize an image to 600px width and change is quality to 60% :
 
-http://example.com/?c=1&=/path/to/image.png&w=600&q=60
+http://example.com/cluster1/60/600x0/path/to/image.png
 
 Crop an image and resize 200/200px :
 
-http://example.com/?c=1&=/path/to/image.png&w=200&h=200&crop=1
+http://example.com/cluster1/crop/200x200/path/to/image.png
 
-API
------------
+Crop an image and resize 200/200px and change quality to 95% :
 
-* **i**
-
-i=  Image path, ex : /path/to/image.png
-
-* **c**
-
-c=  Cluster where is stocked original image, ex: cluster1
-
-* **w**
-
-w= desired width, max 2048, ex: 760
-
-* **h**
-
-h= desired height, max 2048, ex: 110
-
-* **q**
-
-q= desired quality, default 90, ex: 100
-
-* **crop**
-
-crop= if you want to crop image set this parameter. Crop need both parameter h and w. Crop take the larger box with your resize ratio and resize to the specified size.
+http://example.com/cluster1/crop/95/200x200/path/to/image.png
