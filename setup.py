@@ -23,7 +23,7 @@ distutils.core.setup(
     url="https://github.com/noony",
     download_url="https://github.com/noony/ImageResizingServer/tarball/master",
     license="",
-    description="This server provides a service to resize and crop images with a simple GET API.",
+    description="This server provides a service to resize and crop images with a simple API.",
     classifiers=[
         ],
     **kwargs
