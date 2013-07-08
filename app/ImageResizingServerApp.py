@@ -28,6 +28,7 @@ options.parse_config_file('./server.conf')
 LOG = logging.getLogger(__name__)
 LOG.setLevel(logging.ERROR)
 
+
 class ResizerHandler(tornado.web.RequestHandler):
     pilImage = None
     imgUrl = None
@@ -85,11 +86,11 @@ class ResizerHandler(tornado.web.RequestHandler):
             self.set_header('Content-Type', 'image/' + self.format.lower())
             self.write(image.getvalue())
         except:
-            msg = 'Finish Request Error {0}'.format(sys.exc_info()[ 1 ])
+            msg = 'Finish Request Error {0}'.format(sys.exc_info()[1])
             LOG.error(msg)
             raise tornado.web.HTTPError(500, msg)
 
-        return True
+
 
     def checkParams(self, cluster, crop, quality, width, height, imgUrl):
         self.imgUrl = '/' + imgUrl
@@ -98,18 +99,22 @@ class ResizerHandler(tornado.web.RequestHandler):
         self.cluster = cluster
 
         if self.cluster not in options.clusterInfos:
-            raise tornado.web.HTTPError(400, 'Bad argument Cluster : cluster {0} not found in configuration'.format(self.cluster))
+            raise tornado.web.HTTPError(
+                400, 'Bad argument Cluster : cluster {0} not found in configuration'.format(self.cluster))
 
         if self.newHeight == 0 and self.newWidth == 0:
-            raise tornado.web.HTTPError(400, 'Bad argument Height and Width can\'t be both at 0')
+            raise tornado.web.HTTPError(
+                400, 'Bad argument Height and Width can\'t be both at 0')
 
         if self.newHeight != 0:
             if self.newHeight < options.minHeight or self.newHeight > options.maxHeight:
-                raise tornado.web.HTTPError(400, 'Bad argument Height : {0}>=h<{1}'.format(options.minHeight, options.maxHeight))
+                raise tornado.web.HTTPError(
+                    400, 'Bad argument Height : {0}>=h<{1}'.format(options.minHeight, options.maxHeight))
 
         if self.newWidth != 0:
             if self.newWidth < options.minWidth or self.newWidth > options.maxWidth:
-                raise tornado.web.HTTPError(400, 'Bad argument Width : {0}>=w<{1}'.format(options.minWidth, options.maxWidth))
+                raise tornado.web.HTTPError(
+                    400, 'Bad argument Width : {0}>=w<{1}'.format(options.minWidth, options.maxWidth))
 
         if quality is not None:
             self.quality = int(re.match(r'\d+', quality).group())
@@ -122,7 +127,8 @@ class ResizerHandler(tornado.web.RequestHandler):
         if crop is not None:
             self.crop = True
             if self.newWidth == 0 or self.newHeight == 0:
-                raise tornado.web.HTTPError(400, 'Crop error, you have to sprecify both Width ({0}) and Height ({1})'.format(self.newWidth, self.newHeight))
+                raise tornado.web.HTTPError(
+                    400, 'Crop error, you have to sprecify both Width ({0}) and Height ({1})'.format(self.newWidth, self.newHeight))
 
         return True
 
@@ -139,12 +145,14 @@ class ResizerHandler(tornado.web.RequestHandler):
             if content_type.startswith('image'):
                 content = resp.read()
             else:
-                raise tornado.web.HTTPError(415, 'Bad Content type : {0}'.format(content_type))
+                raise tornado.web.HTTPError(
+                    415, 'Bad Content type : {0}'.format(content_type))
         else:
-            msg = 'Image Not found on cluster {0}'.format(options.clusterInfos.get(self.cluster))
+            msg = 'Image Not found on cluster {0}'.format(
+                options.clusterInfos.get(self.cluster))
             LOG.error(msg)
             raise tornado.web.HTTPError(404, msg)
-            
+
         link.close()
         content = StringIO.StringIO(content)
 
@@ -152,13 +160,13 @@ class ResizerHandler(tornado.web.RequestHandler):
             self.pilImage = Image.open(content)
             self.pilImage.load()
         except:
-            msg = 'Make PIL Image Error {0}'.format(sys.exc_info()[ 1 ])
+            msg = 'Make PIL Image Error {0}'.format(sys.exc_info()[1])
             LOG.error(msg)
             raise tornado.web.HTTPError(415, msg)
 
         self.originalWidth, self.originalHeight = self.pilImage.size
         self.format = self.pilImage.format
-        
+
         return True
 
     def resizeImage(self):
@@ -166,40 +174,41 @@ class ResizerHandler(tornado.web.RequestHandler):
             newImg = self.pilImage.resize(
                 (self.newWidth, self.newHeight), Image.ANTIALIAS)
         except:
-            msg = 'Resize Error {0}'.format(sys.exc_info()[ 1 ])
+            msg = 'Resize Error {0}'.format(sys.exc_info()[1])
             LOG.error(msg)
             raise tornado.web.HTTPError(500, msg)
-        
+
         self.pilImage = newImg
         return True
 
     def cropImage(self, cropX, cropY, cropW, cropH):
         try:
             newImg = self.pilImage.crop(
-                (cropX, cropY, (cropX+cropW), (cropY+cropH)))
+                (cropX, cropY, (cropX + cropW), (cropY + cropH)))
         except:
-            msg = 'Crop Error {0}'.format(sys.exc_info()[ 1 ])
+            msg = 'Crop Error {0}'.format(sys.exc_info()[1])
             LOG.error(msg)
             raise tornado.web.HTTPError(500, msg)
-        
+
         self.pilImage = newImg
-        
+
     def write_error(self, status_code, **kwargs):
         if "exc_info" in kwargs:
             self.finish("<html><title>%(message)s</title>"
-                    "<body>%(message)s</body></html>" % {
-                    "message": tornado.escape.xhtml_escape(str(kwargs["exc_info"][1])),
-                })
+                        "<body>%(message)s</body></html>" % {
+                            "message": tornado.escape.xhtml_escape(str(kwargs["exc_info"][1])),
+                        })
         else:
             self.finish("<html><title>%(code)d: %(message)s</title>"
                         "<body>%(code)d: %(message)s</body></html>" % {
-                    "code": status_code,
-                    "message": httplib.responses[status_code],
-                    })
+                            "code": status_code,
+                            "message": httplib.responses[status_code],
+                        })
 
 tornadoapp = tornado.wsgi.WSGIApplication([
     (r"/([0-9a-zA-Z]+)/(crop/)?(\d+/)?(\d+)x(\d+)/(.+)", ResizerHandler),
 ])
+
 
 def application(environ, start_response):
     if 'SCRIPT_NAME' in environ:
