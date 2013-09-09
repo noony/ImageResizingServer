@@ -98,4 +98,4 @@ substr(hash('sha512', 'YOUR_SECRET_TOKEN' . '/cluster1/crop/95/200x200/path/to/i
 result : '61b5'
 ```
 
-Final uri : /61b5//cluster1/crop/95/200x200/path/to/image.png
+Final uri : /61b5/cluster1/crop/95/200x200/path/to/image.png
