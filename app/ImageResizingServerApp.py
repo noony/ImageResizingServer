@@ -19,13 +19,15 @@ import tornado.escape
 from tornado.options import define, options
 
 define("clusterInfos", default={}, help="url of img cluster", type=dict)
-define("signatureSecret", default="", help="add signature to request", type=str)
+define(
+    "signatureSecret", default="", help="add signature to request", type=str)
 define("defaultQuality", default=90, help="default output quality", type=int)
 define("minHeight", default=1, help="minimum height after resize", type=int)
 define("maxHeight", default=2048, help="maximum height after resize", type=int)
 define("minWidth", default=1, help="minimum width after resize", type=int)
 define("maxWidth", default=2048, help="maximum width after resize", type=int)
-define("timeoutGetCluster", default=1, help="timeout for get image on cluster", type=int)
+define("timeoutGetCluster", default=1,
+       help="timeout for get image on cluster", type=int)
 options.parse_config_file('./server.conf')
 
 LOG = logging.getLogger(__name__)
@@ -44,8 +46,9 @@ class ResizerHandler(tornado.web.RequestHandler):
     originalWidth = 0
     originalHeight = 0
 
-    def get(self, cluster, crop, quality, signature, width, height, imgUrl):
-        self.checkParams(cluster, crop, quality, signature, width, height, imgUrl)
+    def get(self, signature, cluster, crop, quality, width, height, imgUrl):
+        self.checkParams(
+            signature, cluster, crop, quality, width, height, imgUrl)
         self.loadImageFromCluster()
 
         if self.crop:
@@ -93,15 +96,13 @@ class ResizerHandler(tornado.web.RequestHandler):
             LOG.error(msg)
             raise tornado.web.HTTPError(500, msg)
 
-
-
-    def checkParams(self, cluster, crop, quality, signature, width, height, imgUrl):
+    def checkParams(self, signature, cluster, crop, quality, width, height, imgUrl):
         self.imgUrl = '/' + imgUrl
         self.newHeight = int(height)
         self.newWidth = int(width)
         self.cluster = cluster
 
-        if options.signatureSecret is not "" and signature[:4] != hashlib.sha512( options.signatureSecret + imgUrl ).hexdigest()[:4]:
+        if options.signatureSecret is not "" and (signature is None or signature[:4] != hashlib.sha512(options.signatureSecret + self.request.uri[5:]).hexdigest()[:4]):
             raise tornado.web.HTTPError(403, 'Bad signature')
 
         if self.cluster not in options.clusterInfos:
@@ -211,7 +212,8 @@ class ResizerHandler(tornado.web.RequestHandler):
                         })
 
 tornadoapp = tornado.wsgi.WSGIApplication([
-    (r"/([0-9a-zA-Z]+)/(crop/)?(\d+/)?([0-9a-zA-Z]{4}/)?(\d+)x(\d+)/(.+)", ResizerHandler),
+    (r"/([0-9a-zA-Z]{4}/)?([0-9a-zA-Z]+)/(crop/)?(\d+/)?(\d+)x(\d+)/(.+)",
+     ResizerHandler),
 ])
 
 
