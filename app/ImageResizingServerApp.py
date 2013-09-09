@@ -33,6 +33,12 @@ options.parse_config_file('./server.conf')
 LOG = logging.getLogger(__name__)
 LOG.setLevel(logging.ERROR)
 
+for name in options.clusterInfos:
+    if len(name) == 4:
+        LOG.error(
+            'You can\t have a cluster name which have a length of 4, because it\'s in conflict with signature.')
+        exit(1)
+
 
 class ResizerHandler(tornado.web.RequestHandler):
     pilImage = None
