@@ -82,8 +82,6 @@ If you want to securise the application, put a token in configuration directive 
 
 And after to retrieve the signature you just have to follow this example:
 
-Example:
-
 configuration: signatureSecret="YOUR_SECRET_TOKEN"
 
 uri: /cluster1/crop/95/200x200/path/to/image.png
