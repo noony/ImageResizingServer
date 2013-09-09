@@ -1,34 +1,34 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <title>Image Resizing Server by noony</title>
 
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-
-    <title>Image Resizing Server by noony</title>
   </head>
-
   <body>
-    <header>
-      <div class="inner">
+    <div class="wrapper">
+      <header>
         <h1>Image Resizing Server</h1>
-        <h2>This server provides a service to resize and crop images with a simple API.</h2>
-        <a href="https://github.com/noony/ImageResizingServer" class="button"><small>View project on</small>GitHub</a>
-      </div>
-    </header>
+        <p>This server provides a service to resize and crop images with a simple API.</p>
 
-    <div id="content-wrapper">
-      <div class="inner clearfix">
-        <section id="main-content">
-          <h1>
+        <p class="view"><a href="https://github.com/noony/ImageResizingServer">View the Project on GitHub <small>noony/ImageResizingServer</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/noony/ImageResizingServer/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/noony/ImageResizingServer/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/noony/ImageResizingServer">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
 <a name="image-resizing-server" class="anchor" href="#image-resizing-server"><span class="octicon octicon-link"></span></a>Image Resizing Server</h1>
 
 <p>This server provides a service to resize and crop images with a simple API. It's able to hold heavy loads and is easy to use.</p>
@@ -44,10 +44,10 @@
 
 <p>need sudo :</p>
 
-<pre><code>apt-get install python-pip python-imaging nginx build-essential python-dev libxml2-dev &amp;&amp; pip install uwsgi tornado
-cd /tmp &amp;&amp; git clone https://github.com/noony/ImageResizingServer.git &amp;&amp; cd ./ImageResizingServer
+<div class="highlight highlight-bash"><pre>apt-get install python-pip python-imaging nginx build-essential python-dev libxml2-dev <span class="o">&amp;&amp;</span> pip install uwsgi tornado
+<span class="nb">cd</span> /tmp <span class="o">&amp;&amp;</span> git clone https://github.com/noony/ImageResizingServer.git <span class="o">&amp;&amp;</span> <span class="nb">cd</span> ./ImageResizingServer
 python setup.py install
-</code></pre>
+</pre></div>
 
 <p>Attention if you haven't installed nginx you have to remove default conf in sites-enabled (rm /etc/nginx/sites-enabled/default)</p>
 
@@ -56,12 +56,32 @@ python setup.py install
 
 <p>You have to define your image clusters. It a simple dict in server.conf</p>
 
+<p>default :</p>
+
+<pre><code>clusterInfos = {
+}
+signatureSecret = ""
+timeoutGetCluster = 1
+defaultQuality = 90
+minHeight = 1
+maxHeight = 2048
+minWidth = 1
+maxWidth = 2048
+</code></pre>
+
 <p>Example : </p>
 
 <pre><code>clusterInfos = {
     'cluster1': 'url.cluster1.com',
     'cluster2': 'url.cluster2.com'
 }
+signatureSecret = "MY_SECRET_TOKEN"
+timeoutGetCluster = 1
+defaultQuality = 100
+minHeight = 1
+maxHeight = 1024
+minWidth = 1
+maxWidth = 1024
 </code></pre>
 
 <p>You have to restart uwsgi after.</p>
@@ -88,25 +108,39 @@ python setup.py install
 <p>Crop an image and resize 200/200px and change quality to 95% :</p>
 
 <p><a href="http://example.com/cluster1/crop/95/200x200/path/to/image.png">http://example.com/cluster1/crop/95/200x200/path/to/image.png</a></p>
-        </section>
 
-        <aside id="sidebar">
-          <a href="https://github.com/noony/ImageResizingServer/zipball/master" class="button">
-            <small>Download</small>
-            .zip file
-          </a>
-          <a href="https://github.com/noony/ImageResizingServer/tarball/master" class="button">
-            <small>Download</small>
-            .tar.gz file
-          </a>
+<h2>
+<a name="securise-your-application" class="anchor" href="#securise-your-application"><span class="octicon octicon-link"></span></a>Securise your application</h2>
 
-          <p class="repo-owner"><a href="https://github.com/noony/ImageResizingServer"></a> is maintained by <a href="https://github.com/noony">noony</a>.</p>
+<p>If you want to securise the application, put a token in configuration directive "signatureSecret".</p>
 
-          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
-        </aside>
-      </div>
+<p>And after to retrieve the signature you just have to follow this example:</p>
+
+<p>configuration: signatureSecret="YOUR_SECRET_TOKEN"</p>
+
+<p>uri: /cluster1/crop/95/200x200/path/to/image.png</p>
+
+<p>Python :</p>
+
+<div class="highlight highlight-python"><pre><span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="n">hashlib</span><span class="o">.</span><span class="n">sha512</span><span class="p">(</span><span class="s">'YOUR_SECRET_TOKEN'</span> <span class="o">+</span> <span class="s">'/cluster1/crop/95/200x200/path/to/image.png'</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="mi">4</span><span class="p">]</span>
+<span class="n">result</span> <span class="p">:</span> <span class="s">'61b5'</span>
+</pre></div>
+
+<p>PHP :</p>
+
+<div class="highlight highlight-php"><pre><span class="nx">substr</span><span class="p">(</span><span class="nb">hash</span><span class="p">(</span><span class="s1">'sha512'</span><span class="p">,</span> <span class="s1">'YOUR_SECRET_TOKEN'</span> <span class="o">.</span> <span class="s1">'/cluster1/crop/95/200x200/path/to/image.png'</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+<span class="nx">result</span> <span class="o">:</span> <span class="s1">'61b5'</span>
+</pre></div>
+
+<p>Final uri : /61b5/cluster1/crop/95/200x200/path/to/image.png</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/noony">noony</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
     </div>
-
-  
+    <script src="javascripts/scale.fix.js"></script>
+    
   </body>
 </html>
